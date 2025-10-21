@@ -1,0 +1,48 @@
+.
+|-- LICENSE
+|-- Makefile
+|-- README.md
+|-- cmd
+|   |-- cli
+|   `-- server
+|-- configs
+|   |-- connections
+|   |   `-- example-conn.yaml
+|   |-- jobs
+|   |   `-- example-job.yaml
+|   |-- plugins
+|   `-- system.yaml
+|-- deployments
+|   |-- docker
+|   |   |-- Dockerfile
+|   |   `-- docker-compose.yml
+|   `-- k8s
+|-- docs
+|   |-- SUMMARY.md
+|   |-- architecture.md
+|   |-- directory-tree.txt
+|   |-- module-interfaces.md
+|   |-- project-structure.md
+|   |-- roadmap.md
+|   `-- tech-selection.md
+|-- go.mod
+|-- internal
+|   |-- api
+|   |-- core
+|   |-- plugin
+|   |-- scheduler
+|   `-- storage
+|-- pkg
+|   |-- config
+|   |-- connector
+|   |-- monitor
+|   |-- reader
+|   |-- record
+|   |-- transformer
+|   `-- writer
+|-- scripts
+`-- web
+    |-- public
+    `-- src
+
+29 directories, 16 files

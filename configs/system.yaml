@@ -1,0 +1,186 @@
+# FustGo 系统配置示例
+
+# 服务器配置
+server:
+  # HTTP 端口
+  port: 8080
+  # 运行模式: debug, release, test
+  mode: release
+  # 读取超时(秒)
+  read_timeout: 60
+  # 写入超时(秒)
+  write_timeout: 60
+
+# 数据库配置
+database:
+  # 数据库类型: sqlite, postgresql
+  type: sqlite
+  
+  # SQLite 配置(开发/测试)
+  sqlite:
+    path: ./data/fustgo.db
+  
+  # PostgreSQL 配置(生产)
+  postgresql:
+    host: localhost
+    port: 5432
+    database: fustgo
+    username: fustgo
+    password: ${DB_PASSWORD}  # 从环境变量读取
+    ssl_mode: disable
+    max_open_conns: 100
+    max_idle_conns: 10
+    conn_max_lifetime: 3600  # 秒
+
+# 缓存配置
+cache:
+  # 缓存类型: memory, redis, file
+  type: memory
+  
+  # 内存缓存配置
+  memory:
+    max_size_mb: 512
+    cleanup_interval: 300  # 秒
+  
+  # Redis 配置
+  redis:
+    host: localhost
+    port: 6379
+    password: ${REDIS_PASSWORD}
+    db: 0
+    max_retries: 3
+  
+  # 文件缓存配置
+  file:
+    path: ./cache
+    max_size_mb: 1024
+
+# 日志配置
+logging:
+  # 日志级别: debug, info, warn, error
+  level: info
+  # 日志格式: json, console
+  format: json
+  # 输出位置
+  outputs:
+    - type: stdout
+    - type: file
+      path: ./logs/fustgo.log
+      max_size: 100  # MB
+      max_backups: 7
+      max_age: 30  # 天
+      compress: true
+
+# 任务执行配置
+executor:
+  # 最大并发任务数
+  max_concurrent_jobs: 50
+  # 单任务最大协程数
+  max_goroutines_per_job: 100
+  # 任务超时时间(秒)
+  default_timeout: 86400  # 24小时
+  # Worker Pool 配置
+  worker_pool:
+    min_workers: 10
+    max_workers: 100
+    queue_size: 1000
+    idle_timeout: 300  # 秒
+
+# 调度器配置
+scheduler:
+  # 是否启用调度器
+  enabled: true
+  # 时区
+  timezone: Asia/Shanghai
+  # 调度器检查间隔(秒)
+  check_interval: 10
+
+# 监控配置
+monitoring:
+  # 是否启用监控
+  enabled: true
+  
+  # Metrics 收集
+  metrics:
+    enabled: true
+    interval: 30  # 秒
+  
+  # OpenObserve 配置
+  openobserve:
+    enabled: false
+    endpoint: http://localhost:5080
+    organization: default
+    stream: fustgo-logs
+    username: ${OPENOBSERVE_USER}
+    password: ${OPENOBSERVE_PASSWORD}
+  
+  # OpenTelemetry 追踪
+  tracing:
+    enabled: false
+    endpoint: http://localhost:4318
+    sample_rate: 0.1  # 10% 采样
+
+# 安全配置
+security:
+  # JWT 配置
+  jwt:
+    secret: ${JWT_SECRET}  # 从环境变量读取
+    expiration: 86400  # 24小时(秒)
+  
+  # 密码加密密钥
+  encryption_key: ${ENCRYPTION_KEY}
+  
+  # CORS 配置
+  cors:
+    enabled: true
+    allowed_origins:
+      - http://localhost:3000
+      - http://localhost:8080
+    allowed_methods:
+      - GET
+      - POST
+      - PUT
+      - DELETE
+    allowed_headers:
+      - Authorization
+      - Content-Type
+
+# 插件配置
+plugins:
+  # 插件配置目录
+  config_dir: ./configs/plugins
+  
+  # 连接池默认配置
+  connection_pool:
+    max_open_conns: 50
+    max_idle_conns: 10
+    conn_max_lifetime: 3600
+
+# 文件存储配置(可选)
+storage:
+  # 类型: local, s3, minio
+  type: local
+  
+  # 本地存储
+  local:
+    path: ./data/files
+  
+  # S3/MinIO 配置
+  s3:
+    endpoint: http://localhost:9000
+    access_key: ${S3_ACCESS_KEY}
+    secret_key: ${S3_SECRET_KEY}
+    bucket: fustgo
+    region: us-east-1
+    use_ssl: false
+
+# 消息队列配置(可选)
+message_queue:
+  # 是否启用消息队列
+  enabled: false
+  
+  # NATS 配置
+  nats:
+    url: nats://localhost:4222
+    max_reconnects: 10
+    reconnect_wait: 2  # 秒
