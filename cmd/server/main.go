@@ -13,6 +13,9 @@ import (
 
 	"github.com/fustgo/fustgo2/internal/api"
 	"github.com/fustgo/fustgo2/internal/config"
+	"github.com/fustgo/fustgo2/internal/monitor"
+	"github.com/fustgo/fustgo2/internal/plugin"
+	"github.com/fustgo/fustgo2/internal/repository"
 	"github.com/fustgo/fustgo2/internal/storage"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -65,6 +68,48 @@ func main() {
 	}
 	
 	logger.Info("Database initialized successfully")
+	
+	// 注册内置插件
+	if err := plugin.RegisterPlugins(); err != nil {
+		logger.Error("Failed to register plugins", zap.Error(err))
+	} else {
+		logger.Info("Plugins registered successfully")
+	}
+	
+	// 初始化仓库
+	jobRepo := repository.NewJobRepository(db)
+	executionRepo := repository.NewExecutionRepository(db)
+	pipelineRepo := repository.NewPipelineRepository(db)
+	
+	// 初始化服务
+	jobService := service.NewJobService(jobRepo)
+	
+	// 初始化监控器
+	monitor := monitor.NewMonitor(jobRepo, executionRepo, pipelineRepo, logger)
+	if err := monitor.Start(); err != nil {
+		logger.Error("Failed to start monitor", zap.Error(err))
+	} else {
+		logger.Info("Monitor started successfully")
+	}
+	defer monitor.Stop()
+	
+	// 初始化调度器
+	// scheduler := scheduler.NewScheduler(jobRepo, jobService, pipelineRepo, logger)
+	// if err := scheduler.Start(); err != nil {
+	// 	logger.Error("Failed to start scheduler", zap.Error(err))
+	// } else {
+	// 	logger.Info("Scheduler started successfully")
+	// }
+	// defer scheduler.Stop()
+	
+	// 初始化优化器
+	// optimizer := optimizer.NewOptimizer(jobRepo, executionRepo, pipelineRepo, logger)
+	// if err := optimizer.Start(); err != nil {
+	// 	logger.Error("Failed to start optimizer", zap.Error(err))
+	// } else {
+	// 	logger.Info("Optimizer started successfully")
+	// }
+	// defer optimizer.Stop()
 	
 	// 设置 Gin 模式
 	gin.SetMode(cfg.Server.Mode)

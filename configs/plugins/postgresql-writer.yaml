@@ -1,0 +1,16 @@
+# PostgreSQL Writer Plugin Configuration
+name: "postgresql-sink"
+type: "writer"
+plugin: "postgresql-writer"
+description: "PostgreSQL数据目标配置示例"
+config:
+  host: "localhost"
+  port: 5432
+  database: "analytics"
+  username: "user"
+  password: "password"
+  table: "user_analytics"
+  mode: "upsert"
+tags: "postgresql,sink"
+enabled: true
+created_by: "admin"

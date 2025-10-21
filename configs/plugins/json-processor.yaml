@@ -1,0 +1,12 @@
+# JSON Processor Plugin Configuration
+name: "json-parser"
+type: "processor"
+plugin: "json-processor"
+description: "JSON解析器配置示例"
+config:
+  field: "metadata"
+  target: "parsed_metadata"
+  remove: true
+tags: "json,processor"
+enabled: true
+created_by: "admin"

@@ -1,0 +1,15 @@
+# Elasticsearch Writer Plugin Configuration
+name: "elasticsearch-sink"
+type: "writer"
+plugin: "elasticsearch-writer"
+description: "Elasticsearch数据目标配置示例"
+config:
+  addresses:
+    - "http://localhost:9200"
+  index: "user-logs-${yyyy.MM.dd}"
+  username: "elastic"
+  password: "password"
+  bulk_size: 1000
+tags: "elasticsearch,sink"
+enabled: true
+created_by: "admin"

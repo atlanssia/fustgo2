@@ -1,9 +1,10 @@
 package api
 
 import (
-	"net/http"
-
+	"github.com/fustgo/fustgo2/internal/api/handlers"
 	"github.com/fustgo/fustgo2/internal/config"
+	"github.com/fustgo/fustgo2/internal/repository"
+	"github.com/fustgo/fustgo2/internal/service"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
@@ -15,16 +16,39 @@ func SetupRouter(cfg *config.Config, db *gorm.DB, logger *zap.Logger) *gin.Engin
 	
 	// 中间件
 	r.Use(gin.Recovery())
-	r.Use(LoggerMiddleware(logger))
+	r.Use(handlers.LoggerMiddleware(logger))
 	
 	// CORS
 	if cfg.Security.CORS.Enabled {
-		r.Use(CORSMiddleware(cfg.Security.CORS))
+		r.Use(handlers.CORSMiddleware(cfg.Security.CORS))
 	}
+	
+	// 初始化仓库
+	jobRepo := repository.NewJobRepository(db)
+	executionRepo := repository.NewExecutionRepository(db)
+	connectionRepo := repository.NewConnectionRepository(db)
+	pluginRepo := repository.NewPluginRepository(db)
+	pluginInstanceRepo := repository.NewPluginInstanceRepository(db)
+	pipelineRepo := repository.NewPipelineRepository(db)
+	
+	// 初始化服务
+	jobService := service.NewJobService(jobRepo)
+	executionService := service.NewExecutionService(executionRepo)
+	connectionService := service.NewConnectionService(connectionRepo)
+	pluginService := service.NewPluginService(pluginRepo)
+	pluginInstanceService := service.NewPluginInstanceService(pluginInstanceRepo)
+	pipelineService := service.NewPipelineService(pipelineRepo)
+	
+	// 初始化处理程序
+	jobHandler := handlers.NewJobHandler(jobService, logger)
+	executionHandler := handlers.NewExecutionHandler(executionService, logger)
+	connectionHandler := handlers.NewConnectionHandler(connectionService, logger)
+	pluginHandler := handlers.NewPluginHandler(pluginService, pluginInstanceService, pluginRepo, pluginInstanceRepo, logger)
+	pipelineHandler := handlers.NewPipelineHandler(pipelineService, pipelineRepo, pluginInstanceRepo, logger)
 	
 	// 健康检查
 	r.GET("/health", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
+		c.JSON(200, gin.H{
 			"status":  "healthy",
 			"version": "dev",
 		})
@@ -36,89 +60,58 @@ func SetupRouter(cfg *config.Config, db *gorm.DB, logger *zap.Logger) *gin.Engin
 		// Jobs API
 		jobs := v1.Group("/jobs")
 		{
-			jobs.GET("", func(c *gin.Context) {
-				c.JSON(http.StatusOK, gin.H{
-					"message": "List jobs",
-				})
-			})
-			jobs.POST("", func(c *gin.Context) {
-				c.JSON(http.StatusOK, gin.H{
-					"message": "Create job",
-				})
-			})
-			jobs.GET("/:id", func(c *gin.Context) {
-				c.JSON(http.StatusOK, gin.H{
-					"message": "Get job",
-					"id":      c.Param("id"),
-				})
-			})
-			jobs.PUT("/:id", func(c *gin.Context) {
-				c.JSON(http.StatusOK, gin.H{
-					"message": "Update job",
-					"id":      c.Param("id"),
-				})
-			})
-			jobs.DELETE("/:id", func(c *gin.Context) {
-				c.JSON(http.StatusOK, gin.H{
-					"message": "Delete job",
-					"id":      c.Param("id"),
-				})
-			})
+			jobs.GET("", jobHandler.List)
+			jobs.POST("", jobHandler.Create)
+			jobs.GET("/:id", jobHandler.GetByID)
+			jobs.PUT("/:id", jobHandler.Update)
+			jobs.DELETE("/:id", jobHandler.Delete)
 		}
 		
 		// Executions API
 		executions := v1.Group("/executions")
 		{
-			executions.GET("", func(c *gin.Context) {
-				c.JSON(http.StatusOK, gin.H{
-					"message": "List executions",
-				})
-			})
-			executions.GET("/:id", func(c *gin.Context) {
-				c.JSON(http.StatusOK, gin.H{
-					"message": "Get execution",
-					"id":      c.Param("id"),
-				})
-			})
+			executions.GET("", executionHandler.List)
+			executions.POST("", executionHandler.Create)
+			executions.GET("/:id", executionHandler.GetByID)
+			executions.PUT("/:id", executionHandler.Update)
+			executions.GET("/job/:job_id", executionHandler.ListByJobID)
 		}
 		
 		// Connections API
 		connections := v1.Group("/connections")
 		{
-			connections.GET("", func(c *gin.Context) {
-				c.JSON(http.StatusOK, gin.H{
-					"message": "List connections",
-				})
-			})
-			connections.POST("", func(c *gin.Context) {
-				c.JSON(http.StatusOK, gin.H{
-					"message": "Create connection",
-				})
-			})
-			connections.GET("/:id", func(c *gin.Context) {
-				c.JSON(http.StatusOK, gin.H{
-					"message": "Get connection",
-					"id":      c.Param("id"),
-				})
-			})
-			connections.PUT("/:id", func(c *gin.Context) {
-				c.JSON(http.StatusOK, gin.H{
-					"message": "Update connection",
-					"id":      c.Param("id"),
-				})
-			})
-			connections.DELETE("/:id", func(c *gin.Context) {
-				c.JSON(http.StatusOK, gin.H{
-					"message": "Delete connection",
-					"id":      c.Param("id"),
-				})
-			})
-			connections.POST("/:id/test", func(c *gin.Context) {
-				c.JSON(http.StatusOK, gin.H{
-					"message": "Test connection",
-					"id":      c.Param("id"),
-				})
-			})
+			connections.GET("", connectionHandler.List)
+			connections.POST("", connectionHandler.Create)
+			connections.GET("/:id", connectionHandler.GetByID)
+			connections.GET("/name/:name", connectionHandler.GetByName)
+			connections.PUT("/:id", connectionHandler.Update)
+			connections.DELETE("/:id", connectionHandler.Delete)
+			connections.POST("/:id/test", connectionHandler.Test)
+		}
+		
+		// Plugins API
+		plugins := v1.Group("/plugins")
+		{
+			plugins.GET("", pluginHandler.ListPlugins)
+			plugins.GET("/:id", pluginHandler.GetPluginByID)
+		}
+		
+		// Plugin Instances API
+		pluginInstances := v1.Group("/plugin-instances")
+		{
+			pluginInstances.GET("", pluginHandler.ListPluginInstances)
+			pluginInstances.POST("", pluginHandler.CreatePluginInstance)
+		}
+		
+		// Pipelines API
+		pipelines := v1.Group("/pipelines")
+		{
+			pipelines.GET("", pipelineHandler.List)
+			pipelines.POST("", pipelineHandler.Create)
+			pipelines.GET("/:id", pipelineHandler.GetByID)
+			pipelines.PUT("/:id", pipelineHandler.Update)
+			pipelines.DELETE("/:id", pipelineHandler.Delete)
+			pipelines.POST("/:id/execute", pipelineHandler.Execute)
 		}
 	}
 	

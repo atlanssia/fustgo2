@@ -76,5 +76,8 @@ func autoMigrate(db *gorm.DB) error {
 		&types.Job{},
 		&types.Execution{},
 		&types.Connection{},
+		&types.Plugin{},
+		&types.PluginInstance{},
+		&types.Pipeline{},
 	)
 }

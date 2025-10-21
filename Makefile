@@ -7,10 +7,14 @@ help:
 	@echo "  make build-web   - 构建前端"
 	@echo "  make build-all   - 构建前端和后端"
 	@echo "  make run         - 运行服务器"
+	@echo "  make run-dev     - 运行开发环境服务器"
 	@echo "  make test        - 运行测试"
 	@echo "  make lint        - 代码检查"
 	@echo "  make clean       - 清理构建产物"
 	@echo "  make docker      - 构建 Docker 镜像"
+	@echo "  make dev-setup   - 初始化开发环境"
+	@echo "  make dev         - 启动开发环境 (Docker)"
+	@echo "  make prod        - 启动生产环境 (Docker)"
 
 # 变量
 APP_NAME=fustgo
@@ -35,6 +39,11 @@ build-all: build-web build
 run:
 	@echo "Running server..."
 	go run ./cmd/server
+
+# 运行开发环境服务器
+run-dev:
+	@echo "Running development server..."
+	go run ./cmd/server --config configs/system.yaml
 
 # 运行测试
 test:
@@ -79,6 +88,18 @@ dev-setup:
 	go mod download
 	cd web && pnpm install
 	@echo "Development environment ready!"
+
+# 启动开发环境 (Docker)
+dev:
+	@echo "Starting development environment..."
+	docker-compose -f deployments/docker/docker-compose.dev.yml up -d
+	@echo "Development environment started! Access at http://localhost:8080"
+
+# 启动生产环境 (Docker)
+prod:
+	@echo "Starting production environment..."
+	docker-compose up -d
+	@echo "Production environment started! Access at http://localhost:8080"
 
 # 数据库迁移
 migrate:

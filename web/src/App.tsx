@@ -4,6 +4,9 @@ import Dashboard from './pages/Dashboard'
 import Jobs from './pages/Jobs'
 import Executions from './pages/Executions'
 import Connections from './pages/Connections'
+import Plugins from './pages/Plugins'
+import Pipelines from './pages/Pipelines'
+import PipelineDesigner from './components/PipelineDesigner'
 
 function App() {
   return (
@@ -15,6 +18,9 @@ function App() {
           <Route path="jobs" element={<Jobs />} />
           <Route path="executions" element={<Executions />} />
           <Route path="connections" element={<Connections />} />
+          <Route path="plugins" element={<Plugins />} />
+          <Route path="pipelines" element={<Pipelines />} />
+          <Route path="config" element={<PipelineDesigner />} />
         </Route>
       </Routes>
     </BrowserRouter>

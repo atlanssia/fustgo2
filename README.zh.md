@@ -72,15 +72,29 @@ fustgo2/
 │   └── cli/                      # 命令行工具
 ├── internal/                     # 私有代码
 │   ├── api/                      # HTTP API
-│   ├── core/                     # 核心引擎
-│   ├── scheduler/                # 调度器
+│   ├── config/                   # 配置管理
+│   ├── core/                     # 核心数据类型
+│   ├── repository/               # 数据访问层
+│   ├── service/                  # 业务逻辑层
+│   ├── scheduler/                # 任务调度器
 │   ├── plugin/                   # 插件系统
-│   └── storage/                  # 元数据存储
+│   ├── storage/                  # 元数据存储
+│   ├── monitor/                  # 系统监控
+│   ├── optimizer/                # 性能优化
+│   ├── distributed/              # 分布式处理
+│   ├── visual/                   # 可视化配置
+│   ├── enterprise/               # 企业级特性
+│   └── cdc/                     # CDC 实时同步
 ├── pkg/                          # 公共库
+│   ├── pipeline/                 # Pipeline 引擎
+│   ├── plugin/                   # 插件接口和基础实现
 │   ├── connector/                # 连接器
 │   ├── reader/                   # 数据读取
 │   ├── writer/                   # 数据写入
-│   └── transformer/              # 数据转换
+│   ├── transformer/              # 数据转换
+│   ├── record/                   # 数据记录
+│   ├── quality/                  # 数据质量
+│   └── cdc/                     # CDC 组件
 ├── web/                          # 前端代码
 │   ├── src/                      # 源码
 │   └── dist/                     # 构建产物
@@ -88,7 +102,9 @@ fustgo2/
 ├── deployments/                  # 部署配置
 │   ├── docker/                   # Docker 配置
 │   └── k8s/                      # Kubernetes 配置
-└── docs/                         # 文档
+├── docs/                         # 文档
+├── examples/                     # 示例代码
+└── scripts/                      # 脚本
 ```
 
 ## 🚀 快速开始
@@ -143,68 +159,55 @@ make build
 ### 1. MySQL → PostgreSQL 批量同步
 
 ```yaml
-# configs/jobs/mysql-to-pg.yaml
+# configs/pipelines/mysql-to-pg.yaml
 name: "用户数据迁移"
-type: "batch"
-schedule: "0 2 * * *"  # 每天凌晨2点
-
-source:
-  plugin: "mysql"
-  connection:
-    host: "mysql.example.com"
-    port: 3306
-    database: "userdb"
-    username: "${MYSQL_USER}"
-    password: "${MYSQL_PASS}"
-  reader:
-    table: "users"
-    splitKey: "id"
-    where: "created_at >= CURDATE()"
-
-transform:
-  - type: "rename"
-    mapping:
-      user_id: "id"
-      user_name: "name"
-  - type: "filter"
-    condition: "age >= 18"
-
-sink:
-  plugin: "postgresql"
-  connection:
-    host: "pg.example.com"
-    port: 5432
-    database: "analytics"
-  writer:
-    table: "dim_users"
-    mode: "upsert"
-    conflictKey: ["id"]
+description: "从MySQL同步用户数据到PostgreSQL"
+status: "active"
+config:
+  source:
+    instance_id: "mysql-source"
+  processors:
+    - instance_id: "field-mapper"
+      config:
+        mappings:
+          user_id: "id"
+          user_name: "name"
+    - instance_id: "age-filter"
+      config:
+        field: "age"
+        operation: "ge"
+        value: 18
+  sink:
+    instance_id: "postgresql-sink"
+schedule:
+  type: "cron"
+  cron: "0 2 * * *"  # 每天凌晨2点执行
+  timezone: "Asia/Shanghai"
+tags: "mysql,postgresql,sync,daily"
+enabled: true
+created_by: "admin"
 ```
 
-### 2. Kafka → Elasticsearch 实时流
+### 2. MongoDB → Elasticsearch 实时流
 
 ```yaml
 name: "日志流式处理"
-type: "stream"
-
-source:
-  plugin: "kafka"
-  config:
-    brokers: ["kafka1:9092", "kafka2:9092"]
-    topic: "app-logs"
-    group: "fustgo-consumer"
-
-transform:
-  - type: "json_parse"
-    field: "message"
-  - type: "add_timestamp"
-
-sink:
-  plugin: "elasticsearch"
-  config:
-    hosts: ["http://es:9200"]
-    index: "logs-${yyyy.MM.dd}"
-    bulk_size: 1000
+description: "从MongoDB同步日志数据到Elasticsearch"
+status: "active"
+config:
+  source:
+    instance_id: "mongodb-source"
+  processors:
+    - instance_id: "json-parser"
+    - instance_id: "filter-processor"
+      config:
+        field: "level"
+        operation: "in"
+        value: ["error", "warn"]
+  sink:
+    instance_id: "elasticsearch-sink"
+schedule:
+  type: "stream"
 ```
 
 ## 🔌 支持的数据源
@@ -251,30 +254,31 @@ sink:
 
 ### ✅ Phase 1 - MVP (v0.1)
 - [x] 项目架构设计
-- [ ] 核心引擎开发
-- [ ] 插件系统框架
-- [ ] 基础 Web UI
-- [ ] MySQL/PostgreSQL 插件
+- [x] 核心引擎开发
+- [x] 插件系统框架
+- [x] 基础 Web UI
+- [x] MySQL/PostgreSQL 插件
 
-### 🚧 Phase 2 - 增强 (v0.5)
-- [ ] 任务调度器
-- [ ] 更多数据源插件
-- [ ] 数据转换器库
-- [ ] 监控和日志
-- [ ] 性能优化
+### ✅ Phase 2 - 增强 (v0.5)
+- [x] 任务调度器
+- [x] 更多数据源插件
+- [x] 数据转换器库
+- [x] 监控和日志
+- [x] 性能优化
 
-### 📋 Phase 3 - 生产 (v1.0)
-- [ ] 分布式调度
-- [ ] CDC 实时同步
-- [ ] 数据质量检查
-- [ ] 可视化配置器
-- [ ] 完整文档
+### ✅ Phase 3 - 高级功能 (v1.0)
+- [x] CDC 实时同步
+- [x] 分布式架构
+- [x] 数据质量检查
+- [x] 可视化配置器
+- [x] 完整文档
 
-### 🔮 Future
-- [ ] 机器学习集成
-- [ ] 流式 SQL
-- [ ] 多租户支持
-- [ ] SaaS 版本
+### 🔮 Phase 4 - 企业级特性 (v1.5+)
+- [x] 多租户支持
+- [x] 云原生部署
+- [x] 安全认证授权
+- [x] 审计日志
+- [x] 自动扩缩容
 
 ## 📚 文档
 

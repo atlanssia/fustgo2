@@ -1,0 +1,13 @@
+# MongoDB Reader Plugin Configuration
+name: "mongodb-source"
+type: "reader"
+plugin: "mongodb-reader"
+description: "MongoDB数据源配置示例"
+config:
+  uri: "mongodb://localhost:27017"
+  database: "testdb"
+  collection: "users"
+  # query: "{\"age\": {\"$gte\": 18}}"
+tags: "mongodb,source"
+enabled: true
+created_by: "admin"

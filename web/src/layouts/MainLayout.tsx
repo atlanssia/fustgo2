@@ -8,6 +8,9 @@ import {
   LinkOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
+  SettingOutlined,
+  ApiOutlined,
+  PartitionOutlined,
 } from '@ant-design/icons'
 
 const { Header, Sider, Content } = Layout
@@ -27,6 +30,11 @@ export default function MainLayout() {
       label: '仪表板',
     },
     {
+      key: '/pipelines',
+      icon: <PartitionOutlined />,
+      label: '数据管道',
+    },
+    {
       key: '/jobs',
       icon: <DatabaseOutlined />,
       label: '任务管理',
@@ -40,6 +48,16 @@ export default function MainLayout() {
       key: '/connections',
       icon: <LinkOutlined />,
       label: '连接配置',
+    },
+    {
+      key: '/plugins',
+      icon: <ApiOutlined />,
+      label: '插件管理',
+    },
+    {
+      key: '/config',
+      icon: <SettingOutlined />,
+      label: '拖拽配置',
     },
   ]
 
