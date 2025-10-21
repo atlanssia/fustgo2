@@ -120,14 +120,14 @@ func (r *FileReader) Validate() error {
 
 // Read 读取文件
 func (r *FileReader) Read(ctx context.Context, output chan<- *record.Record) error {
-	defer close(output)
-
 	// 打开文件
 	file, err := os.Open(r.filePath)
 	if err != nil {
+		close(output)
 		return plugin.NewError(r.Name(), "open_file", err, false)
 	}
 	defer file.Close()
+	defer close(output)
 
 	// 获取文件大小
 	stat, _ := file.Stat()
