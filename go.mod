@@ -1,6 +1,6 @@
 module github.com/fustgo/fustgo2
 
-go 1.21
+go 1.25
 
 require (
 	// Web Framework

@@ -133,7 +133,7 @@ fustgo2/
 ## 技术栈
 
 ### 后端
-- Go 1.21+
+- Go 1.25+
 - Gin Web 框架
 - GORM ORM
 - SQLite/PostgreSQL

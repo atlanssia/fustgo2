@@ -5,7 +5,7 @@
 **🚀 高性能 | 🔌 插件化 | 📊 可视化配置 | 🎯 生产就绪**
 
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
-[![Go Version](https://img.shields.io/badge/go-%3E%3D1.21-blue.svg)](https://golang.org/)
+[![Go Version](https://img.shields.io/badge/go-%3E%3D1.25-blue.svg)](https://golang.org/)
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)]()
 
 一个对标 DataX 和 Benthos 的现代化数据同步引擎，采用纯 Go 技术栈，提供企业级数据集成能力。
