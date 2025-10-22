@@ -182,7 +182,7 @@ ok  	github.com/fustgo/fustgo2/pkg/record	0.002s
 ## 🔧 技术栈实现
 
 ### 后端技术栈 ✅
-- ✅ Go 1.21+
+- ✅ Go 1.25+
 - ✅ Gin (Web 框架)
 - ✅ GORM (ORM)
 - ✅ Viper (配置管理)
