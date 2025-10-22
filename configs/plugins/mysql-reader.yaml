@@ -1,0 +1,16 @@
+# MySQL Reader Plugin Configuration
+name: "mysql-source"
+type: "reader"
+plugin: "mysql-reader"
+description: "MySQL数据源配置示例"
+config:
+  host: "localhost"
+  port: 3306
+  database: "testdb"
+  username: "user"
+  password: "password"
+  table: "users"
+  # query: "SELECT * FROM users WHERE created_at > '2025-01-01'"
+tags: "mysql,source"
+enabled: true
+created_by: "admin"

@@ -1,0 +1,23 @@
+# MongoDB to Elasticsearch 数据同步管道示例
+name: "mongodb-to-elasticsearch-sync"
+description: "从MongoDB同步用户日志到Elasticsearch"
+status: "active"
+config: 
+  source:
+    instance_id: "mongodb-source"
+  processors:
+    - instance_id: "json-parser"
+    - instance_id: "filter-processor"
+      config:
+        field: "age"
+        operation: "ge"
+        value: 18
+  sink:
+    instance_id: "elasticsearch-sink"
+schedule:
+  type: "cron"
+  cron: "0 3 * * *"  # 每天凌晨3点执行
+  timezone: "Asia/Shanghai"
+tags: "mongodb,elasticsearch,sync,daily"
+enabled: true
+created_by: "admin"

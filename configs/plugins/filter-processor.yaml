@@ -1,0 +1,13 @@
+# Filter Processor Plugin Configuration
+name: "age-filter"
+type: "processor"
+plugin: "filter-processor"
+description: "年龄过滤器配置示例"
+config:
+  field: "age"
+  operation: "ge"
+  value: 18
+  # condition: "age >= 18"
+tags: "filter,processor"
+enabled: true
+created_by: "admin"

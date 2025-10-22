@@ -1,0 +1,53 @@
+# 数据源连接配置示例
+
+# 连接名称
+name: "mysql-production"
+
+# 连接类型
+type: "mysql"
+
+# 连接描述
+description: "生产环境 MySQL 数据库"
+
+# 连接配置
+config:
+  host: "mysql.example.com"
+  port: 3306
+  database: "production"
+  username: "${MYSQL_PROD_USER}"
+  password: "${MYSQL_PROD_PASSWORD}"
+  
+  # 连接参数
+  params:
+    charset: "utf8mb4"
+    parseTime: true
+    loc: "Asia/Shanghai"
+  
+  # 连接池配置
+  pool:
+    max_open_conns: 50
+    max_idle_conns: 10
+    conn_max_lifetime: 3600  # 秒
+    conn_max_idle_time: 600  # 秒
+  
+  # SSL/TLS 配置
+  ssl:
+    enabled: false
+    # ca_cert: "/path/to/ca.pem"
+    # client_cert: "/path/to/client-cert.pem"
+    # client_key: "/path/to/client-key.pem"
+
+# 标签(用于分类和搜索)
+tags:
+  - "production"
+  - "mysql"
+  - "primary"
+
+# 是否启用
+enabled: true
+
+# 创建时间
+created_at: "2025-10-21T10:00:00Z"
+
+# 更新时间
+updated_at: "2025-10-21T10:00:00Z"

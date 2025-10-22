@@ -1,0 +1,105 @@
+# FustGo 开发环境配置
+
+# 服务器配置
+server:
+  # HTTP 端口
+  port: 8080
+  # 运行模式: debug, release, test
+  mode: debug
+  # 读取超时(秒)
+  read_timeout: 60
+  # 写入超时(秒)
+  write_timeout: 60
+
+# 数据库配置 (开发环境使用 SQLite)
+database:
+  # 数据库类型: sqlite, postgresql
+  type: sqlite
+  
+  # SQLite 配置(开发/测试)
+  sqlite:
+    path: ./data/fustgo_dev.db
+
+# 缓存配置 (开发环境使用内存缓存)
+cache:
+  # 缓存类型: memory, redis, file
+  type: memory
+  
+  # 内存缓存配置
+  memory:
+    max_size_mb: 512
+    cleanup_interval: 300  # 秒
+
+# 日志配置
+logging:
+  # 日志级别: debug, info, warn, error
+  level: debug
+  # 日志格式: json, console
+  format: console
+  # 输出位置
+  outputs:
+    - type: stdout
+
+# 任务执行配置
+executor:
+  # 最大并发任务数
+  max_concurrent_jobs: 10
+  # 单任务最大协程数
+  max_goroutines_per_job: 10
+  # 任务超时时间(秒)
+  default_timeout: 3600  # 1小时
+  # Worker Pool 配置
+  worker_pool:
+    min_workers: 2
+    max_workers: 10
+    queue_size: 100
+    idle_timeout: 300  # 秒
+
+# 调度器配置
+scheduler:
+  # 是否启用调度器
+  enabled: true
+  # 时区
+  timezone: Asia/Shanghai
+  # 调度器检查间隔(秒)
+  check_interval: 10
+
+# 监控配置
+monitoring:
+  # 是否启用监控
+  enabled: true
+  
+  # Metrics 收集
+  metrics:
+    enabled: true
+    interval: 30  # 秒
+
+# 安全配置
+security:
+  # JWT 配置
+  jwt:
+    secret: fustgo_dev_secret_key
+    expiration: 86400  # 24小时(秒)
+  
+  # 密码加密密钥
+  encryption_key: fustgo_dev_encryption_key
+  
+  # CORS 配置
+  cors:
+    enabled: true
+    allowed_origins:
+      - http://localhost:3000
+      - http://localhost:8080
+    allowed_methods:
+      - GET
+      - POST
+      - PUT
+      - DELETE
+    allowed_headers:
+      - Authorization
+      - Content-Type
+
+# 插件配置
+plugins:
+  # 插件配置目录
+  config_dir: ./configs/plugins

@@ -1,0 +1,110 @@
+version: '3.8'
+
+services:
+  # FustGo 主服务
+  fustgo:
+    image: fustgo:latest
+    container_name: fustgo
+    build:
+      context: ../..
+      dockerfile: deployments/docker/Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      # 数据库配置
+      - DB_TYPE=postgresql
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=fustgo
+      - DB_USER=fustgo
+      - DB_PASSWORD=fustgo_secret
+      
+      # Redis 配置
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      
+      # 日志级别
+      - LOG_LEVEL=info
+      
+      # 服务配置
+      - SERVER_PORT=8080
+    volumes:
+      - ./configs:/app/configs
+      - fustgo-data:/app/data
+      - fustgo-logs:/app/logs
+    depends_on:
+      - postgres
+      - redis
+    restart: unless-stopped
+    networks:
+      - fustgo-network
+
+  # PostgreSQL 数据库
+  postgres:
+    image: postgres:15-alpine
+    container_name: fustgo-postgres
+    environment:
+      - POSTGRES_DB=fustgo
+      - POSTGRES_USER=fustgo
+      - POSTGRES_PASSWORD=fustgo_secret
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - fustgo-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fustgo"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis 缓存
+  redis:
+    image: redis:7-alpine
+    container_name: fustgo-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+    networks:
+      - fustgo-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # OpenObserve (可选 - 监控和日志)
+  openobserve:
+    image: public.ecr.aws/zinclabs/openobserve:latest
+    container_name: fustgo-openobserve
+    ports:
+      - "5080:5080"
+    environment:
+      - ZO_ROOT_USER_EMAIL=admin@example.com
+      - ZO_ROOT_USER_PASSWORD=admin123
+      - ZO_DATA_DIR=/data
+    volumes:
+      - openobserve-data:/data
+    restart: unless-stopped
+    networks:
+      - fustgo-network
+
+volumes:
+  fustgo-data:
+    driver: local
+  fustgo-logs:
+    driver: local
+  postgres-data:
+    driver: local
+  redis-data:
+    driver: local
+  openobserve-data:
+    driver: local
+
+networks:
+  fustgo-network:
+    driver: bridge

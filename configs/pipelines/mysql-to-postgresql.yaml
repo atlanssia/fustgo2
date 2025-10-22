@@ -1,0 +1,30 @@
+# MySQL to PostgreSQL 数据同步管道示例
+name: "mysql-to-postgresql-sync"
+description: "从MySQL同步用户数据到PostgreSQL"
+status: "active"
+config: 
+  source:
+    instance_id: "mysql-source"
+    # 可以覆盖插件实例的配置
+    # config:
+    #   table: "users_new"
+  processors:
+    - instance_id: "age-filter"
+    - instance_id: "field-mapper"
+      config:
+        mappings:
+          user_id: "id"
+          user_name: "name"
+          created_at: "created_time"
+  sink:
+    instance_id: "postgresql-sink"
+    # 可以覆盖插件实例的配置
+    # config:
+    #   table: "users_analytics"
+schedule:
+  type: "cron"
+  cron: "0 2 * * *"  # 每天凌晨2点执行
+  timezone: "Asia/Shanghai"
+tags: "mysql,postgresql,sync,daily"
+enabled: true
+created_by: "admin"
